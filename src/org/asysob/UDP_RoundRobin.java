@@ -29,7 +29,7 @@ public class UDP_RoundRobin {
     }
 
     public static void Node(int my_port, String peer_host, int peer_port) throws IOException {
-        Statistics stats = new Statistics();
+        Statistics stats = new Statistics(1);
         System.out.printf("Peer forwarding messages from port <%d> to <%s,%d>\n", my_port, peer_host, peer_port);
         DatagramSocket my_socket = new DatagramSocket(my_port);
         InetSocketAddress peer_address = new InetSocketAddress(peer_host, peer_port);
