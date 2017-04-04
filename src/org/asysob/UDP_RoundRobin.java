@@ -1,6 +1,8 @@
 package org.asysob;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.*;
 
 public class UDP_RoundRobin {
@@ -8,22 +10,22 @@ public class UDP_RoundRobin {
     private static final boolean debug = false;
 
     public static void main(String[] args) throws IOException {
-        if (args.length < 3) Usage("\"join <my_port> <peer_host> <peer_port>\" or \"start|stop <host> <port>\"");
+        if (args.length < 3) Usage("\"join <my_port> <peer_host> <peer_port>\" or \"start|stop|console <host> <port>\"");
         switch (args[0].toLowerCase()) {
             case "join":
                 if (args.length != 4) Usage("Arguments: join <my_port> <peer_host> <peer_port>");
-                int my_port = Integer.parseInt(args[1]);
-                String peer_host = args[2];
-                int peer_port = Integer.parseInt(args[3]);
-                Node(my_port, peer_host, peer_port);
+                Node(Integer.parseInt(args[1]), args[2], Integer.parseInt(args[3]));
                 break;
             case "start":
             case "stop":
                 if (args.length != 3) Usage("Arguemnts: start|stop <host> <port>");
-                String command = args[0];
+                Control(args[0].toLowerCase(), args[1], Integer.parseInt(args[2]));
+                break;
+            case "console":
+                if (args.length != 3) Usage("Arguemnts: console <host> <port>");
                 String host = args[1];
                 int port = Integer.parseInt(args[2]);
-                Control(command, host, port);
+                Console(args[1], Integer.parseInt(args[2]));
                 break;
             default:
                 System.err.println("First argument must be join, start or stop");
@@ -80,6 +82,32 @@ public class UDP_RoundRobin {
         DatagramSocket my_socket = new DatagramSocket();
         Send(my_socket, address, command);
         my_socket.close();
+    }
+
+    private static void Console ( String host, int port ) throws IOException {
+        BufferedReader cli=new BufferedReader(new InputStreamReader(System.in));
+        boolean keep_on_running = true;
+        while (keep_on_running) {
+            System.out.print("udprr> ");
+            String command = cli.readLine();
+            String[] token = command.split("\\s+");
+            if (token.length == 0) {
+                System.out.println("Seems to be no sensible input");
+                continue;
+            }
+            switch (token[0].toLowerCase()) {
+                case "quit":
+                case "exit":
+                    keep_on_running = false;
+                    break;
+                case "start":
+                case "stop":
+                    Control(token[0].toLowerCase(),host,port);
+                    break;
+                default:
+                    System.out.printf("Unknown command <%s>\n",token[0]);
+            }
+        }
     }
 
     private static void Usage(String s) {
