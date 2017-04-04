@@ -1,5 +1,7 @@
 package org.asysob;
 
+import java.text.DecimalFormat;
+
 public class Statistics {
 
     public Statistics(int skip) {
@@ -32,7 +34,7 @@ public class Statistics {
 
     public double Duration() {
         assert (startHappened);
-        return (((double) t_stop) - ((double) t_start)) / 1000.0 / 1000.0;
+        return (((double) t_stop) - ((double) t_start)) / 1000.0 / 1000.0; // Normalize to milliseconds
     }
 
     public long NumberOfMeasures() {
@@ -58,16 +60,18 @@ public class Statistics {
 
     public String Report() {
         StringBuilder s = new StringBuilder();
+        DecimalFormat df = new DecimalFormat("##0.0E00");
         s.append("n=");
         s.append(n);
         s.append(", min=");
-        s.append(String.format("%.4E", min));
-        s.append(", average=");
-        s.append(String.format("%.4E", AverageDuration()));
-        s.append(", sdeviation=");
-        s.append(String.format("%.4E", StandardDeviation()));
-        s.append(", max=");
-        s.append(String.format("%.4E", max));
+        s.append(String.format(df.format(min)));
+        s.append(" msec, average=");
+        s.append(String.format(df.format(AverageDuration())));
+        s.append(" msec, sdeviation=");
+        s.append(String.format(df.format(StandardDeviation())));
+        s.append(" msec, max=");
+        s.append(String.format(df.format(max)));
+        s.append(" msec");
         return s.toString();
     }
 
