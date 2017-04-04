@@ -5,6 +5,8 @@ import java.net.*;
 
 public class UDP_RoundRobin {
 
+    private static final boolean debug = false;
+
     public static void main(String[] args) throws IOException {
         if (args.length < 3) Usage("\"join <my_port> <peer_host> <peer_port>\" or \"start|stop <host> <port>\"");
         switch (args[0].toLowerCase()) {
@@ -29,7 +31,7 @@ public class UDP_RoundRobin {
     }
 
     public static void Node(int my_port, String peer_host, int peer_port) throws IOException {
-        Statistics stats = new Statistics(1);
+        Statistics stats = new Statistics(5);
         System.out.printf("Peer forwarding messages from port <%d> to <%s,%d>\n", my_port, peer_host, peer_port);
         DatagramSocket my_socket = new DatagramSocket(my_port);
         InetSocketAddress peer_address = new InetSocketAddress(peer_host, peer_port);
@@ -38,7 +40,9 @@ public class UDP_RoundRobin {
             stats.StartMeasure();
             String message = Receive(my_socket);
             stats.StopMeasure();
-            System.out.printf("Received <%s> after %f ms waiting\n", message, stats.Duration());
+            if (debug) System.out.printf("Received <%s> after %f ms waiting\n", message, stats.Duration());
+            if (stats.NumberOfMeasures() % 100000 == 0)
+                System.out.printf(".");
             switch (message.toLowerCase()) {
                 case "stop":
                     keep_on_running = false;
@@ -52,7 +56,7 @@ public class UDP_RoundRobin {
             Send(my_socket, peer_address, message);
         }
         my_socket.close();
-        System.out.printf("Statistics: %s\n",stats.Report());
+        System.out.printf("\nStatistics: %s\n",stats.Report());
     }
 
     public static String Receive(DatagramSocket socket) throws IOException {
