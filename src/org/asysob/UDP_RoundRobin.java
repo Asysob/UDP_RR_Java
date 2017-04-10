@@ -7,8 +7,6 @@ import java.net.*;
 
 public class UDP_RoundRobin {
 
-    private static final boolean debug = false;
-
     public static void main(String[] args) throws IOException {
         if (args.length < 3) Usage("\"join <my_port> <peer_host> <peer_port>\" or \"start|stop|console <host> <port>\"");
         switch (args[0].toLowerCase()) {
@@ -31,6 +29,8 @@ public class UDP_RoundRobin {
                 System.err.println("First argument must be join, start or stop");
         }
     }
+
+    private static final boolean debug = false;
 
     public static void Node(int my_port, String peer_host, int peer_port) throws IOException {
         Statistics stats = new Statistics(5);
